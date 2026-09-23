@@ -1,0 +1,95 @@
+.boards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 2rem;
+    align-items: flex-start;
+}
+
+.board {
+    display: grid;
+    grid-template-columns:
+        repeat(var(--board-columns), minmax(0, 1fr));
+    gap: 2px;
+    padding: 2px;
+    background: #a9c4d8;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.board-panel {
+    flex: 1 1 18rem;
+    max-width: 28rem;
+    min-width: 0;
+    padding: 1rem;
+    box-sizing: border-box;
+    background: #f0f7fc;
+    border: 1px solid #c6d9e8;
+    border-radius: 12px;
+}
+
+.board-panel h2 {
+    margin: 0 0 1rem;
+    font: 600 1.1rem system-ui, sans-serif;
+    color: #17354a;
+}
+
+.square {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    display: grid;
+    place-items: center;
+    background: #e6f3fc;
+    color: #17354a;
+    font: 600 0.9rem system-ui, sans-serif;
+}
+
+.square--O {
+    background: #e6f3fc;
+    /* Water: pale blue */
+}
+
+.square--S {
+    background: #bbf7d0;
+    /* Ship: dark gray */
+}
+
+.square--X {
+    background: #dc2626;
+    /* Hit: red */
+}
+
+.square--M {
+    background: #facc15;
+    /* Miss: yellow */
+}
+
+
+button.square {
+    cursor: crosshair;
+}
+
+button.square:hover {
+    background: #b9def5;
+}
+
+button.square:focus-visible {
+    outline: 3px solid #176ba0;
+    outline-offset: -3px;
+}
+
+.game-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    min-height: 1.5em;
+    background: #f0f7fc;
+    border: 1px solid #c6d9e8;
+    border-radius: 8px;
+    color: #17354a;
+    font: 500 1rem system-ui, sans-serif;
+}

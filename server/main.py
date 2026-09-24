@@ -4,12 +4,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from battleship import Battleship, Ship, Cell
 from pydantic import BaseModel, Field
 
+import os
+
+
 app = FastAPI()
 game = Battleship()
 
+allowedOrigins = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:5173",
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=allowedOrigins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

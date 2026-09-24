@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+
 function App() {
   const [player, setPlayer] = useState(0)
 
@@ -23,7 +26,7 @@ function App() {
 
       try {
         const response = await fetch(
-          `http://localhost:8000/game/${player}`,
+          `${API_BASE_URL}/game/${player}`,
           { signal: controller.signal }
         )
 
@@ -58,7 +61,7 @@ function App() {
     setError(null)
 
     try {
-      const response = await fetch(`http://localhost:8000/shoot`, {
+      const response = await fetch(`${API_BASE_URL}/shoot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ player: player, x: x, y: y })
@@ -95,7 +98,7 @@ function App() {
     setError(null)
 
     try {
-      const response = await fetch('http://localhost:8000/reset', {
+      const response = await fetch(`${API_BASE_URL}/reset`, {
         method: 'POST',
       })
 

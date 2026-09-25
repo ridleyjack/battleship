@@ -5,3 +5,21 @@ dist/
 # Server
 __pycache__/
 .venv/
+
+# Android
+*.iml
+.gradle/
+.kotlin/
+.idea/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# OS
+.DS_Store

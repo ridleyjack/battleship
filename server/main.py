@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 
 from battleship import Battleship, Ship, Cell
-from pydantic import BaseModel, Field
+
 
 import os
 

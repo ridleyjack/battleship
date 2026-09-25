@@ -32,3 +32,9 @@ Open http://localhost:5173. Select a player, click enemy tiles to fire, and use 
 - Phone on the same Wi-Fi: `http://<your-computer-IP>:8000`
 
 The Android app currently displays Player A's board.
+
+## Web
+![Web app](docs/web.png)
+
+## Android
+![Android app](docs/android.png)

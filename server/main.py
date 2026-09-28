@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from battleship import Battleship, Ship, Cell
+from battleship import Battleship, Ship, Cell, NotPlayersTurn, AlreadyShot, OutOfBounds, GameOver
 
 
 import os
@@ -74,27 +74,16 @@ def get_game(player: int = Path(ge=0, le=1)):
 
 @app.post("/shoot")
 def shoot(request: ShotRequest):
-    targetPlayerID = 1 - request.player
-    target = game.get_player(targetPlayerID)
-    board = target.board
-
-    if request.y >= len(board):
-        raise HTTPException(422, detail="Row is outside the board.")
-
-    if request.x >= len(board[request.y]):
-        raise HTTPException(422, detail="Column is outside the board.")
-
-    if game.game_over():
-        raise HTTPException(409, detail="Game is over. Reset to play again.")
-
-    if board[request.y][request.x] in (Cell.HIT, Cell.MISS):
-        raise HTTPException(409, detail="You already fired at this tile.")
-
-    result = game.shootAt(
-        targetPlayerID,
-        request.x,
-        request.y
-    )
+    try:
+        result = game.shoot(
+            request.player,
+            request.x,
+            request.y
+        )
+    except (GameOver, NotPlayersTurn, AlreadyShot) as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except(OutOfBounds) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     return {
         "result": result,

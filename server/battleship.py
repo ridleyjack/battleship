@@ -2,6 +2,16 @@ import random
 
 from enum import Enum, auto
 
+
+class NotPlayersTurn(Exception):
+    pass
+class AlreadyShot(Exception):
+    pass
+class OutOfBounds(Exception):
+    pass
+class GameOver(Exception):
+    pass
+
 class Cell(Enum):
     EMPTY = auto()
     MISS = auto()
@@ -58,20 +68,27 @@ class Player:
                         y2 = y2+1
                 placed = True
 
-    def shoot(self, x, y):
+    def validate_shot(self, x, y):
+        if y < 0 or y >= len(self.board):
+            raise OutOfBounds("Shot row is out of bounds!") 
+        if x < 0 or x >= len(self.board[0]):
+            raise OutOfBounds("Shot column is out of bounds!") 
         cell = self.board[y][x]
+        if cell == Cell.MISS or cell == Cell.HIT:
+            raise AlreadyShot("You have already shot at this tile!")
+
+    def shoot(self, x, y):
+        self.validate_shot(x, y)
+        cell = self.board[y][x]
+
         if cell == Cell.EMPTY:
             self.board[y][x] = Cell.MISS
             return "Miss!"
-        if cell == Cell.MISS or cell == Cell.HIT:
-            return "Invalid"
 
         # Otherwise it's a ship
         ship = cell
-
         self.board[y][x] = Cell.HIT        
         ship.health = ship.health - 1
-
         if ship.dead():
             self.shipsAlive -= 1
             return ship.name + " sunk!"
@@ -83,14 +100,23 @@ class Battleship:
     def __init__(self):
         width = 10
         height = 10
-        
+
+        self.playerTurn = 0        
         self.playerA = Player(width, height)
         self.playerB = Player(width, height)
 
-    def shootAt(self, player, x, y):
-        if player == 0:
-            return self. playerA.shoot(x, y)
-        return self.playerB.shoot(x, y)
+    def shoot(self, player, x, y):
+        if self.game_over():
+            raise GameOver("Game is over!")
+        if player != self.playerTurn:
+            raise NotPlayersTurn("It's not your turn!")
+
+        target = self.get_player(1 - player)
+        result = target.shoot(x, y)
+
+        # Above throws on invalid shot.
+        self.playerTurn = 1 - self.playerTurn
+        return result
 
     def game_over(self):
         return self.playerA.shipsAlive == 0 or self.playerB.shipsAlive == 0

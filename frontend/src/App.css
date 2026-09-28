@@ -1,3 +1,22 @@
+.app-header {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: #17354a;
+    color: #fff;
+    font-family: system-ui, sans-serif;
+}
+
+.app-header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.app-header p {
+    margin: 0.5rem 0 0;
+    color: #d6e8f5;
+}
+
 .boards {
     display: flex;
     flex-wrap: wrap;

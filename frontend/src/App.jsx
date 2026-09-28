@@ -5,7 +5,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 function App() {
-  const [player, setPlayer] = useState(0)
+  const [requestPending, setRequestPending] = useState(false)
 
   const [game, setGame] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -13,6 +13,7 @@ function App() {
 
   const [refreshCount, setRefreshCount] = useState(0)
 
+  const [player, setPlayer] = useState(0)
   const [message, setMessage] = useState('Choose a tile to fire.')
   const [gameOver, setGameOver] = useState(false)
 
@@ -57,9 +58,11 @@ function App() {
   }, [player, refreshCount])
 
   async function handleClick(x, y,) {
-    if (gameOver || loading) return
+    if (gameOver || loading || requestPending) return
     setError(null)
 
+    setMessage("Firing!")
+    setRequestPending(true)
     try {
       const response = await fetch(`${API_BASE_URL}/shoot`, {
         method: "POST",
@@ -90,13 +93,21 @@ function App() {
       setRefreshCount(count => count + 1)
     }
     catch (err) {
+      setMessage('')
       setError(err.message)
+    }
+    finally {
+      setRequestPending(false)
     }
   }
 
   async function reset() {
+    if (requestPending)
+      return
     setError(null)
 
+    setMessage("Resetting!")
+    setRequestPending(true)
     try {
       const response = await fetch(`${API_BASE_URL}/reset`, {
         method: 'POST',
@@ -109,28 +120,34 @@ function App() {
       setMessage('New game! Choose a tile to fire.')
       setRefreshCount(count => count + 1)
     } catch (err) {
+      setMessage('')
       setError(err.message)
+    } finally {
+      setRequestPending(false)
     }
   }
 
   return (
     <>
+      <header className="app-header">
+        <h1>Battleship</h1>
+        <p>Find and sink all five enemy ships to win.</p>
+      </header>
       <PlayerSelect
         player={player}
         setPlayer={setPlayer}
+        disabled={requestPending || loading}
       />
       <button
         onClick={() => reset()}
+        disabled={requestPending || loading}
       >
         Reset
       </button>
 
-      {loading && <p role="status">Loading game…</p>}
-      {error && <p role="alert">{error}</p>}
-
       {!loading && game && (
         <div className="boards">
-          <GameBoard board={game.targetBoard} title="Enemy Fleet" handleClick={handleClick} clickable disabled={gameOver} />
+          <GameBoard board={game.targetBoard} title="Enemy Fleet" handleClick={handleClick} clickable disabled={requestPending || loading || gameOver} />
           <GameBoard board={game.ownBoard} title="Friendly Fleet" handleClick={handleClick} />
         </div>
       )}
@@ -138,6 +155,8 @@ function App() {
       <p className="game-message" role="status">
         {message}
       </p>
+      {loading && <p role="status">Loading game…</p>}
+      {error && <p role="alert">{error}</p>}
     </>
   )
 }
@@ -151,7 +170,7 @@ function Square({ x, y, value, handleClick, clickable = false, disabled }) {
       <button
         className={className}
         onClick={() => handleClick(x, y)}
-        disabled={disabled}
+        disabled={disabled || value === 'X' || value === 'M'}
       >
         {value}
       </button>
@@ -200,19 +219,19 @@ function GameBoard({ board, title, handleClick, clickable = false, disabled }) {
   )
 }
 
-function PlayerSelect({ player, setPlayer }) {
+function PlayerSelect({ player, setPlayer, disabled }) {
   return (
     <>
       <button
         onClick={() => setPlayer(0)}
-        disabled={player === 0}
+        disabled={disabled || player === 0}
       >
         Player A
       </button>
 
       <button
         onClick={() => setPlayer(1)}
-        disabled={player === 1}
+        disabled={disabled || player === 1}
       >
         Player B
       </button>
